@@ -10,7 +10,7 @@ console.log(id)
 
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 90 },
+        { field: '_id', headerName: 'ID', width: 90 },
         {
           field: 'ClientName',
           headerName: 'Client Name',
@@ -35,13 +35,17 @@ console.log(id)
         // }
       
       ];
+
+      
+
+      const rows= clientsData ? clientsData : null
       
     //   console.log("Clients",clientsData)
-      const rows=  clientsData ? clientsData.map(items =>({
-       id :items._id,...items
+      // const rows=  clientsData ? clientsData.map(items =>({
+      //  id :items._id,...items
 
 
-      })) : null 
+      // })) : null 
      
     //     { id: 1, lastName: 'Snow', firstName: 'Jon'},
     //     { id: 2, lastName: 'Lannister', firstName: 'Cersei' },
@@ -63,9 +67,13 @@ console.log(id)
    <>
        <Box sx={{ height: 400, width: '100%' }}>
       <DataGrid
-      
+    
         rows={rows}
         columns={columns}
+
+        // material ui datagrid ma support gareenaayo by default _id 
+        //  si aan u xalino taas waxaan default row id  datagrid id to _id u badalno
+        getRowId={(row) => row._id}
         initialState={{
           pagination: {
             paginationModel: {
