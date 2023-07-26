@@ -13,6 +13,7 @@ import SendIcon from '@mui/icons-material/Send';
 // import ExpandMore from '@mui/icons-material/ExpandMore';
 import AddHomeWorkIcon from '@mui/icons-material/AddHomeWork';
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 // import StarBorder from '@mui/icons-material/StarBorder';
 
@@ -20,6 +21,7 @@ import { useState } from "react";
 
 export const Sidebar = ({DrawerOpen,DrawerClose})=>{
 
+  const [selectedMenu,setMenu]=useState('')
  
      
     return<>
@@ -59,15 +61,34 @@ onClose={DrawerClose}
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
       </ListItemButton>
-      <ListItemButton>
+      <Link to={'home'}>
+      <ListItemButton
+      sx={[selectedMenu === 'Home' && {bgcolor:"primary.main",color:"white",":hover":{
+        bgcolor:"primary.dark"
+      }}]}
+      onClick={()=>{
+        setMenu('Home')
+        DrawerClose()
+      }}>
         <ListItemIcon>
-          <DraftsIcon />
+          <DraftsIcon sx={[selectedMenu==='Home' && {color:"white"}]} />
         </ListItemIcon>
         <ListItemText primary="Home" />
       </ListItemButton>
-      <ListItemButton >
+
+      </Link>
+
+
+      <ListItemButton sx={[selectedMenu === 'Guryaha' && {bgcolor:"primary.main",color:"white",":hover":{
+        bgcolor:"primary.dark"
+      }}]}
+      onClick={()=>{
+        setMenu('Guryaha')
+        DrawerClose()
+
+      }}>
         <ListItemIcon>
-          <InboxIcon />
+          <InboxIcon  sx={[selectedMenu==='Guryaha' && {color:"white"}]}  />
         </ListItemIcon>
         <ListItemText primary="Guryaha" />
         
@@ -91,14 +112,22 @@ onClose={DrawerClose}
         
       </ListItemButton>
 
-      <ListItemButton >
+<Link to={'client'}>
+      <ListItemButton sx={[selectedMenu === 'client' && {bgcolor:"primary.main",color:"white",":hover":{
+        bgcolor:"primary.dark"
+      }}]}
+      onClick={()=>{
+        setMenu('client')
+        DrawerClose()
+
+      }}>
         <ListItemIcon>
-          <InboxIcon />
+          <InboxIcon  sx={[selectedMenu==='client' && {color:"white"}]} />
         </ListItemIcon>
         <ListItemText primary="Clients" />
         
       </ListItemButton>
-
+      </Link>
       <ListItemButton >
         <ListItemIcon>
           <InboxIcon />
@@ -142,21 +171,29 @@ onClose={DrawerClose}
       component="nav"
  
     >
-      <ListItemButton>
+      <ListItemButton >
         <ListItemIcon>
           <SendIcon />
         </ListItemIcon>
         <ListItemText primary="Dashboard" />
       </ListItemButton>
-      <ListItemButton>
+    
+    
+    <Link to={'home'} style={{textDecoration:"none"}}>
+      <ListItemButton onClick={()=>setMenu('Home')}  sx={[ selectedMenu==='Home' && {bgcolor:"primary.main",color:"white",":hover":{bgcolor:"primary.dark"}}]}>
         <ListItemIcon>
-          <DraftsIcon />
+          <DraftsIcon sx={[ selectedMenu==='Home' && {color:"white"}]} />
         </ListItemIcon>
         <ListItemText primary="Home" />
       </ListItemButton>
-      <ListItemButton >
+
+      </Link>
+
+      <ListItemButton
+      sx={[selectedMenu ==='Guryaha' && {bgcolor:"primary.main",color:"white",":hover":{bgcolor:"primary.dark"}}]}
+      onClick={()=>setMenu('Guryaha')} >
         <ListItemIcon>
-          <InboxIcon />
+          <InboxIcon sx={[selectedMenu === 'Guryaha' && {color:"white"}]}/>
         </ListItemIcon>
         <ListItemText primary="Guryaha" />
         
@@ -164,30 +201,34 @@ onClose={DrawerClose}
      
 
 
-      <ListItemButton >
+       
+      <ListItemButton    >
         <ListItemIcon>
-          <InboxIcon />
+          <InboxIcon  />
         </ListItemIcon>
         <ListItemText primary="Images" />
         
       </ListItemButton>
-
-      <ListItemButton >
-        <ListItemIcon>
+      <Link to={'services'} style={{textDecoration:"none"}}>
+      <ListItemButton    >
+        <ListItemIcon> 
           <InboxIcon />
         </ListItemIcon>
         <ListItemText primary="Services" />
         
       </ListItemButton>
+      </Link>
 
-      <ListItemButton >
+      <Link to={'client'} style={{textDecoration:"none"}}>
+      <ListItemButton  sx={[selectedMenu ==='client' && {bgcolor:"primary.main",color:"white",":hover":{bgcolor:"primary.dark"}}]}
+      onClick={()=>setMenu('client')} >
         <ListItemIcon>
-          <InboxIcon />
+          <InboxIcon sx={[selectedMenu === 'client' && {color:"white"}]} />
         </ListItemIcon>
         <ListItemText primary="Clients" />
         
       </ListItemButton>
-
+      </Link>
       <ListItemButton >
         <ListItemIcon>
           <InboxIcon />

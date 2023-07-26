@@ -3,6 +3,8 @@ import { Sidebar } from "./SideBar"
 import MenuIcon from '@mui/icons-material/Menu';
 import { useState } from "react";
 import { Clients } from "../clients/client";
+import { Outlet } from "react-router-dom";
+ 
 export const Dashboard = () => {
 const [draweOpen,setDrawer]=useState(false)
 
@@ -19,7 +21,7 @@ setDrawer(!draweOpen)
 <Box sx={{width:"100%"}}>
 {/* top header */}
 
-<Box sx={{backgroundColor:"green",color:"white",display:"flex",justifyContent:{
+<Box sx={{bgcolor:"primary.main",color:"white",display:"flex",justifyContent:{
     xs:"space-between",
     md:"end"
 }}} p={2}>
@@ -37,8 +39,12 @@ setDrawer(!draweOpen)
 {/* top header end */}
 
 {/* content pages */}
-<Clients/>
 
+
+{/* <Clients/> */}
+
+<Outlet/>
+ 
 {/* end content */}
 
 
