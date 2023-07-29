@@ -8,44 +8,79 @@ import DialogTitle from '@mui/material/DialogTitle';
 import CircularProgress from '@mui/material/CircularProgress';
 import { useEffect, useState } from "react";
 import ClientList from "./ClientList";
-import { AddClient, UpdateClient, getAllClient } from "./apiCrud";
+import { AddClient, DeleteClient, UpdateClient, getAllClient } from "./apiCrud";
 import { useForm } from "react-hook-form";
-import { AddCircleOutlineSharp } from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { AddCircleOutlineSharp, ErrorOutlineOutlined } from "@mui/icons-material";
+import {  toast } from 'react-toastify';
+ import { Link } from "react-router-dom";
+import {
+  useMutation,
+    useQuery,
+    useQueryClient
+  } from '@tanstack/react-query'
+import ConfirmDelete from "../deleteComponent/ConfirmDelete";
+import {  useDeleteHook } from "../deleteComponent/deleteHooks";
 export const Clients = ()=>{
+    const queryclient = useQueryClient()
 const {register,handleSubmit,reset,setValue,formState:{errors}} = useForm()
 const [clid,setclid]=useState('')
+const [cldeleteid,setcldeleteid]=useState('')
     const [dailogOpen,setDailog]=useState(false)
     const ToggleDailog = ()=>{
         setDailog(!dailogOpen)
     }
-
-const [Clients,setClients] = useState([])
-   
-useEffect(()=>{
-    const allClients =  async ()=>{
-        
-        const {data} = await  getAllClient()
-    
-        // console.log(data)
-
-        setClients(data)
+ 
+const {data:client,isLoading,isError}= useQuery({
+    queryKey:['client'],
+    queryFn: async ()=>  await getAllClient(),
+    onError:()=>{
+        toast.error("Sory xogta lama keeni karo")
     }
+    
+})
+const {mutate,isLoading:mutateLoading} = useMutation({
+    mutationFn:async(data)=>await AddClient(data),
+    onSuccess:()=>{
+    
+        queryclient.invalidateQueries({queryKey:['client']})
+        // console.log("data has been saved on success")
+        toast.success("Data Has been Saved")
+    },
+    onError:()=>{
+    //    console.log("error ayaa jira") 
+    toast.error("Error ayaa jiro !")
+    }
+})
 
-    allClients()
+const {mutate:updateMutate,isLoading:updateLoading} = useMutation({
+    mutationFn: async (data)=>{
+ 
+return await UpdateClient(clid,data)
 
+    },
+    onSuccess:()=>{
+        queryclient.invalidateQueries({queryKey:['client']})
+        toast.success("data has been updated")
+        ToggleDailog()
+    },
 
-},[])
-
+    onError:(e)=>{
+    
+        toast.error("Sorry Update ma dhicin")
+        console.log(e)
+    }
+})
  
 const AddNewClient = async (data)=>{
 
     if(clid !==''){
 
  try{
-  await UpdateClient(clid,data)
-console.log("Data has been Updated")
-ToggleDailog()
+    // console.log(data)
+//   update section
+updateMutate(data)
+// console.log("Data has been Updated")
+
 reset()
     } catch( err){
 console.log("error ayaa jira ",err)
@@ -54,9 +89,10 @@ console.log("error ayaa jira ",err)
     }
     else {
         try{
-            await AddClient(data)
-          console.log("Data has been saved")
-          ToggleDailog()
+            mutate(data)
+            // await AddClient(data)
+        
+        ToggleDailog()
           reset()
               } catch( err){
           console.log("error ayaa jira ",err)
@@ -69,6 +105,10 @@ console.log("error ayaa jira ",err)
    
 }
 
+
+
+
+
 const UpdateClientInfo = async (data)=>{
 // console.log("xogta la rabbo in la update gareeyo",data)
     setValue("ClientName",data.ClientName)
@@ -79,23 +119,55 @@ const UpdateClientInfo = async (data)=>{
 }
 
 
+//  delete mutate
+
+const {mutate:deleteMutate} = useMutation({
+    mutationFn:(id)=>DeleteClient(id),
+    onSuccess:()=>{
+        toast.success("Client has  been deleted")
+        deletehook.Toggle()
+        queryclient.invalidateQueries({queryKey:['client']})
+    },
+    onError:()=>{
+        toast.error("Sorry client not deleted")
+    }
+
+
+})
+const deletehook = useDeleteHook()
+
+const deleteCheck = ()=>{
+
+    // alert("deleted")
+    deleteMutate(cldeleteid)
+   
+}
+// cal delete fucntion
 const deleteClientInfo = async (data)=>{
+   deletehook.setMessage(data.ClientName)
+    deletehook.Toggle()
+    setcldeleteid(data._id)
 
-    console.log("Xogta la rabo in la delete gareyo",data
-    )
+    // console.log("Xogta la rabo in la delete gareyo",data._id   )
 
 
+
+
+
+  
 
 }
+
     return <>
    <Box p={4}>
 
+<ConfirmDelete open={deletehook.open} toggle={deletehook.Toggle} message={deletehook.message} confirm={deleteCheck} />
 
  {/* breadcrumbs */}
 
  <Breadcrumbs aria-label="breadcrumb">
   <Link underline="hover" color="inherit" href="#">
-    Dashboard
+    Dashboard {import.meta.env.VITE_APP_NAME}
   </Link>
  
   <Typography color="text.primary">Client</Typography>
@@ -137,7 +209,7 @@ const deleteClientInfo = async (data)=>{
         </DialogContent>
         <DialogActions>
           <Button onClick={ToggleDailog}>Cancel</Button>
-          <Button variant="contained" sx={{bgcolor:"primary.main"}} type="submit"  size="small">
+          <Button variant="contained" disabled={mutateLoading} sx={{bgcolor:"primary.main"}} type="submit"  size="small">
 
       {clid !=='' ? "Update" : "Submit"}
           </Button>
@@ -150,8 +222,30 @@ const deleteClientInfo = async (data)=>{
 
 {/* Delete conformation */}
 <Divider/>
- {Clients ? <ClientList deleteClient={deleteClientInfo} clientsData={Clients} update={UpdateClientInfo} /> : null }
+
+ 
+
+{isError ? (<Box sx={{ display:'flex',justifyContent:'center',textAlign:'center',alignItems:"center",p:10}}>
+
+<Box>
+
+<ErrorOutlineOutlined sx={{fontSize:"58px" }} />
+<Typography >Data noy found!</Typography>
+    </Box>
+
+</Box>): isLoading ? (<Box sx={{ display:'flex',justifyContent:'center',textAlign:'center',alignItems:"center",p:10}}>
+
+<Box>
+
+<CircularProgress sx={{fontSize:"58px" }} />
+<Typography >Loading...</Typography>
+    </Box>
+
+</Box>) :  <ClientList deleteClient={deleteClientInfo} clientsData={client?.data} update={UpdateClientInfo} />  }
+ 
     
    </Box>
     </>
 }
+
+ 

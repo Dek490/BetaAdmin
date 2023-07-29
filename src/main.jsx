@@ -4,28 +4,15 @@ import App from './App.jsx'
 import './index.css'
 import { BrowserRouter } from 'react-router-dom'
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import {
+  QueryClient,
+  QueryClientProvider,
+  
+} from '@tanstack/react-query'
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
-
-// const theme = createTheme({
-//   palette: {
-//     primary: {
-//       main: '#1E8449',
-//       // light: will be calculated from palette.primary.main,
-//       // dark: will be calculated from palette.primary.main,
-//       // contrastText: will be calculated to contrast with palette.primary.main
-//     },
-//     error:{
-//             main :"#E50F0C",
-//             warning:"#E75E06"
-//           },
-//     secondary: {
-//       main: '#E0C2FF',
-//       light: '#F5EBFF',
-//       // dark: will be calculated from palette.secondary.main,
-//       contrastText: '#47008F',
-//     },
-//   },
-// });
+const queryClient = new QueryClient()
 
 const theme = createTheme({
   palette: {
@@ -44,13 +31,14 @@ const theme = createTheme({
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
    
-
+<QueryClientProvider client={queryClient} >
    <ThemeProvider theme={theme}>
     <BrowserRouter>
     
     <App />
-    
+   <ToastContainer/>
     </BrowserRouter>
     </ThemeProvider>
+    </QueryClientProvider>
   </React.StrictMode>,
 )

@@ -28,7 +28,7 @@ export default function ClientList({clientsData,update,deleteClient}) {
           renderCell:(params)=>{
 
             return <Box>
-
+ 
               <IconButton onClick={()=>update(params.row)}>
 
                 <BorderColorIcon sx={{color:"primary.main"}}/>
