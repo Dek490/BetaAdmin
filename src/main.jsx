@@ -11,6 +11,7 @@ import {
 } from '@tanstack/react-query'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { UserContextProvider } from './ContextApi/UserContext.jsx'
 
 const queryClient = new QueryClient()
 
@@ -34,8 +35,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 <QueryClientProvider client={queryClient} >
    <ThemeProvider theme={theme}>
     <BrowserRouter>
-    
+
+    <UserContextProvider>
+      
     <App />
+    </UserContextProvider>
+ 
+
    <ToastContainer/>
     </BrowserRouter>
     </ThemeProvider>

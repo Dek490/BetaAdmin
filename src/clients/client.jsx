@@ -20,6 +20,7 @@ import {
   } from '@tanstack/react-query'
 import ConfirmDelete from "../deleteComponent/ConfirmDelete";
 import {  useDeleteHook } from "../deleteComponent/deleteHooks";
+import { AddQuery, DeleteQuery, GetQuery, UpdateQuery } from "../shared/reactquery";
 export const Clients = ()=>{
     const queryclient = useQueryClient()
 const {register,handleSubmit,reset,setValue,formState:{errors}} = useForm()
@@ -30,46 +31,18 @@ const [cldeleteid,setcldeleteid]=useState('')
         setDailog(!dailogOpen)
     }
  
-const {data:client,isLoading,isError}= useQuery({
-    queryKey:['client'],
-    queryFn: async ()=>  await getAllClient(),
-    onError:()=>{
-        toast.error("Sory xogta lama keeni karo")
-    }
-    
-})
-const {mutate,isLoading:mutateLoading} = useMutation({
-    mutationFn:async(data)=>await AddClient(data),
-    onSuccess:()=>{
-    
-        queryclient.invalidateQueries({queryKey:['client']})
-        // console.log("data has been saved on success")
-        toast.success("Data Has been Saved")
-    },
-    onError:()=>{
-    //    console.log("error ayaa jira") 
-    toast.error("Error ayaa jiro !")
-    }
-})
-
-const {mutate:updateMutate,isLoading:updateLoading} = useMutation({
-    mutationFn: async (data)=>{
  
-return await UpdateClient(clid,data)
 
-    },
-    onSuccess:()=>{
-        queryclient.invalidateQueries({queryKey:['client']})
-        toast.success("data has been updated")
-        ToggleDailog()
-    },
+const {data:client,isLoading,isError} = GetQuery("/client","client")
 
-    onError:(e)=>{
-    
-        toast.error("Sorry Update ma dhicin")
-        console.log(e)
-    }
-})
+ 
+
+const {mutateAsync,isLoading:mutateLoading} = AddQuery("/client","client")
+
+ 
+
+const {mutateAsync:updateMutate} = UpdateQuery("/client",clid,"client")
+
  
 const AddNewClient = async (data)=>{
 
@@ -78,10 +51,15 @@ const AddNewClient = async (data)=>{
  try{
     // console.log(data)
 //   update section
-updateMutate(data)
+updateMutate(data).then(()=>{
+    toast.success("Data has been Updated")
+    ToggleDailog()
+    reset()
+
+})
 // console.log("Data has been Updated")
 
-reset()
+
     } catch( err){
 console.log("error ayaa jira ",err)
 
@@ -89,11 +67,14 @@ console.log("error ayaa jira ",err)
     }
     else {
         try{
-            mutate(data)
+            mutateAsync(data).then(()=>{
+                toast.success("Data has been saved")
+                ToggleDailog()
+                reset()
+            })
             // await AddClient(data)
         
-        ToggleDailog()
-          reset()
+     
               } catch( err){
           console.log("error ayaa jira ",err)
           
@@ -119,27 +100,19 @@ const UpdateClientInfo = async (data)=>{
 }
 
 
-//  delete mutate
+ 
+const {mutateAsync:deleteMutate} = DeleteQuery("/client","client")
 
-const {mutate:deleteMutate} = useMutation({
-    mutationFn:(id)=>DeleteClient(id),
-    onSuccess:()=>{
-        toast.success("Client has  been deleted")
-        deletehook.Toggle()
-        queryclient.invalidateQueries({queryKey:['client']})
-    },
-    onError:()=>{
-        toast.error("Sorry client not deleted")
-    }
-
-
-})
 const deletehook = useDeleteHook()
 
 const deleteCheck = ()=>{
 
     // alert("deleted")
-    deleteMutate(cldeleteid)
+    deleteMutate(cldeleteid).then(()=>{
+toast.success("data has been Deleted")
+deletehook.Toggle()
+
+    })
    
 }
 // cal delete fucntion
@@ -159,7 +132,7 @@ const deleteClientInfo = async (data)=>{
 }
 
     return <>
-   <Box p={4}>
+   <Box  >
 
 <ConfirmDelete open={deletehook.open} toggle={deletehook.Toggle} message={deletehook.message} confirm={deleteCheck} />
 
@@ -221,11 +194,11 @@ const deleteClientInfo = async (data)=>{
 
 
 {/* Delete conformation */}
-<Divider/>
-
+<Divider/> dd
+{/* {client} */}
  
 
-{isError ? (<Box sx={{ display:'flex',justifyContent:'center',textAlign:'center',alignItems:"center",p:10}}>
+{isError  ? (<Box sx={{ display:'flex',justifyContent:'center',textAlign:'center',alignItems:"center",p:10}}>
 
 <Box>
 
@@ -233,7 +206,7 @@ const deleteClientInfo = async (data)=>{
 <Typography >Data noy found!</Typography>
     </Box>
 
-</Box>): isLoading ? (<Box sx={{ display:'flex',justifyContent:'center',textAlign:'center',alignItems:"center",p:10}}>
+</Box>): isLoading || !client   ? (<Box sx={{ display:'flex',justifyContent:'center',textAlign:'center',alignItems:"center",p:10}}>
 
 <Box>
 
@@ -241,7 +214,7 @@ const deleteClientInfo = async (data)=>{
 <Typography >Loading...</Typography>
     </Box>
 
-</Box>) :  <ClientList deleteClient={deleteClientInfo} clientsData={client?.data} update={UpdateClientInfo} />  }
+</Box>) :  <ClientList deleteClient={deleteClientInfo} clientsData={client} update={UpdateClientInfo} />  }
  
     
    </Box>

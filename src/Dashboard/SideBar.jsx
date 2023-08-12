@@ -189,6 +189,18 @@ onClose={DrawerClose}
 
       </Link>
 
+      <Link to={'about'} style={{textDecoration:"none"}}>
+      <ListItemButton onClick={()=>setMenu('about')}  sx={[ selectedMenu==='about' && {bgcolor:"primary.main",color:"white",":hover":{bgcolor:"primary.dark"}}]}>
+        <ListItemIcon>
+          <DraftsIcon sx={[ selectedMenu==='about' && {color:"white"}]} />
+        </ListItemIcon>
+        <ListItemText primary="About" />
+      </ListItemButton>
+
+      </Link>
+
+
+
       <ListItemButton
       sx={[selectedMenu ==='Guryaha' && {bgcolor:"primary.main",color:"white",":hover":{bgcolor:"primary.dark"}}]}
       onClick={()=>setMenu('Guryaha')} >
